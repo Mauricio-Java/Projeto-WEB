@@ -11,31 +11,35 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
-@Table(name= "tb_product")
-public class Product implements Serializable{
-	
-	private static final long serialVersionUID = 1L; 
-	
+@Table(name = "tb_product")
+public class Product implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String  name;
-	private String  description;
-	private Double  price;
+	private String name;
+	private String description;
+	private Double price;
 	private String imgUrl;
-	
-	//@Transient     // RETIRANDO O PROVISORIO 
+
+	// @Transient // RETIRANDO O PROVISORIO
 	@ManyToMany
-	@JoinTable(name = "tb_product_category",
-	joinColumns = @JoinColumn(name= "product_id"),
-	inverseJoinColumns = @JoinColumn(name = "category_id"))
-	private Set<Category> categories = new HashSet<>();   // Associação e tb Para garantir que a minha coleçao nao comece valendo nula
+	@JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+	private Set<Category> categories = new HashSet<>(); // Associação e tb Para garantir que a minha coleçao nao comece
+														// valendo nula
+	@OneToMany(mappedBy = "id.product")
+	private Set<OrderItem> items = new HashSet<>();
 
 	public Product() {
-		
+
 	}
 
 	public Product(Long id, String name, String description, Double price, String imgUrl) {
@@ -91,9 +95,18 @@ public class Product implements Serializable{
 		return categories;
 	}
 
-	public void setCategories(Set<Category> categories) {   // APAGAR
-		this.categories = categories;  // APAGAR 
-	} //APAGAR 
+	public void setCategories(Set<Category> categories) { // APAGAR
+		this.categories = categories; // APAGAR
+	} // APAGAR
+	
+	@JsonIgnore
+	public Set<Order> getOrders(){
+		Set<Order> set = new HashSet<>();
+				for (OrderItem x : items) {
+					set.add(x.getOrder());
+				}
+				return set;
+	}
 
 	@Override
 	public int hashCode() {
@@ -119,14 +132,5 @@ public class Product implements Serializable{
 			return false;
 		return true;
 	}
-	
-	
-	
 
-	
-	  
-	
-
-	
-	
 }

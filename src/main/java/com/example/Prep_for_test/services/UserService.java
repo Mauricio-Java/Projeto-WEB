@@ -30,4 +30,8 @@ public User findById(Long Id) {
 public User insert(User obj) {
 return repository.save(obj);
 }
+
+public void delete(Long id) {
+		repository.deleteById(id);
+	}
 }
